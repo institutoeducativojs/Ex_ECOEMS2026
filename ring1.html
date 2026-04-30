@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen IEJS</title>
+    <style>
+        body {
+            font-family: "Times New Roman", Arial;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #quiz-container, #result-container {
+            display: none;
+        }
+
+        #timer {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .header {
+            position: relative;
+            text-align: center;
+        }
+
+        .header img {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 150px;
+            height: 100px;
+        }
+
+        #question-number {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        #question-subject {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .responsive-img {
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+            display: block;
+            margin: 10px auto;
+        }
+
+        @media (max-width: 768px) {
+            .header img {
+        width: 120px;  /* Reduce el tamaño de la imagen */
+        height: auto;
+        position: relative; /* Quita la posición absoluta */
+        display: block;
+        margin: 0 auto; /* Centra la imagen */
+		}
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+        }
+
+        .option img {
+            width: 200px;
+            height: auto;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .option img {
+                width: 150px;
+            }
+        }
+
+        .option label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://i.imgur.com/NFAJG1k.jpeg" alt="Logo IEJS">
+        <h1>INSTITUTO EDUCATIVO</h1>
+        <h1>JUSTO SIERRA</h1>
+        <h2>ECOEMS</h2>
+        <h3>CUARTO EXAMEN</h3>
+    </div>
+
+    <div id="start-container">
+        <label for="studentName">Ingresa tu nombre completo:</label>
+        <input type="text" id="studentName" placeholder="Nombre completo">
+        <br><br>
+        <button id="startBtn">Iniciar Examen</button>
+    </div>
+
+    <div id="quiz-container" class="hidden">
+        <p id="timer"></p>
+        <p id="question-number"></p>
+        <p id="question-subject"></p>
+        <p id="question-text"></p>
+        <p id="question-sentence"></p>
+        <div id="options"></div>
+        <button type="button" id="nextBtn">Siguiente</button>
+    </div>
+
+    <div id="result-container" class="hidden">
+        <h2>Examen finalizado</h2>
+        <p id="score"></p>
+        <p id="total-time"></p>
+        <button id="downloadBtn">Descargar Resultados</button>
+    </div>
+
+    <script>
+	
+        const questions = [
+			
+			//119
+			//1
+			{ 
+                question: "¿Cuál es el término que continúa en la siguiente sucesión?", 
+                options: ["A) 24", "B) 22", "C) 28", "D) 26"], 
+                answer: "A) 24", 
+                subject: "Habilidad matemática",
+                sentence: "8, 12, 14, 18, 20, __"
+            },
+			//2
+			{ 
+                question: "Los primeros cuatro términos de una sucesión son: 2 . 1 - 3, 3 . 3 - 4, 4 . 5 - 5, 5 . 7 - 6, __", 
+                options: ["A) 10 . 17 – 11", "B) 11 . 15 – 10", "C) 11 . 17 – 10", "D) 13 . 15 – 11"], 
+                answer: "A) 10 . 17 – 11", 
+                subject: "Habilidad matemática",
+                sentence: "¿Cuál sería el noveno término?"
+            },
+			//3
+			{ 
+                question: "Encuentra los términos que faltan en la siguiente sucesión", 
+                options: ["A) 49, 0", "B) 38, 49", "C) 38, 0", "D) 49, 38"], 
+                answer: "C) 38, 0", 
+                subject: "Habilidad matemática",
+                sentence: "5, 12, 16, 8, 27, 4, __, __, …"
+            },
+			//4
+			{ 
+                question: "¿Cuál es el término que falta en la siguiente sucesión?", 
+                options: ["A) 6 5/3", "B) 7 5/3", "C) 6 3/5", "D) 7 9/7"], 
+                answer: "D) 7 9/7", 
+                subject: "Habilidad matemática",
+                sentence: "3 7/5, 5 3/4, __, 9 4/5, 11 11/9, 13 5/6"
+            },
+			//5
+			{ 
+                question: "Elige las figuras que continúan esta serie:", 
+                options: ["https://i.imgur.com/7XV38kJ.png", "https://i.imgur.com/fY5avTU.png", "https://i.imgur.com/Eaj81iH.png", "https://i.imgur.com/7WDCXlK.png"], 
+                answer: "https://i.imgur.com/fY5avTU.png", 
+                subject: "Habilidad matemática",
+                sentence: "https://i.imgur.com/BR1b7ww.png",
+				imageSize: { width: 550, height: 200 }
+            },
+			//6
+			{
+				question: "Selecciona la imagen que continúa en la serie",
+				options: ["https://i.imgur.com/4mkGorX.png", "https://i.imgur.com/zPSCyuB.png", "https://i.imgur.com/1oIbjfh.png", "https://i.imgur.com/6FND2T7.png"],
+				answer: "https://i.imgur.com/1oIbjfh.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/mJT9tin.png"
+			},
+			//7
+			{
+				question: "El número de mosaicos blancos que tendrá la quinta figura de la siguiente sucesión es",
+				options: ["A) 25", "B) 27", "C) 29", "D) 33"],
+				answer: "C) 29",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/ZShSwUk.png"
+			},
+			//8
+			{
+				question: "Indica el tercer reloj de la siguiente serie",
+				options: ["https://i.imgur.com/RErvL2P.png", "https://i.imgur.com/tQkk24R.png", "https://i.imgur.com/F4kMlUa.png", "https://i.imgur.com/d1vwUD2.png"],
+				answer: "https://i.imgur.com/RErvL2P.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/jgdI15H.png",
+				imageSize: { width: 750, height: 200 }
+			},
+			//9
+			{
+				question: "¿Cuál de las figuras corresponde a la siguiente después de ser girada 180°?",
+				options: ["https://i.imgur.com/LNKUItE.png", "https://i.imgur.com/7O3D3qZ.png", "https://i.imgur.com/amtGi0o.png", "https://i.imgur.com/eunmPy8.png"],
+				answer: "https://i.imgur.com/LNKUItE.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/KLOcr2Q.png"
+			},
+			//10
+			{
+				question: "¿Cuál es el desarrollo plano que corresponde al cubo?",
+				options: ["https://i.imgur.com/6EO5HGr.png", "https://i.imgur.com/IOlcD8g.png", "https://i.imgur.com/bbU9o1c.png", "https://i.imgur.com/W5WCWU2.png"],
+				answer: "https://i.imgur.com/IOlcD8g.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/dru9sLZ.png",
+				imageSize: { width: 400, height: 400 }
+			},
+			//11
+			{
+				question: "Seleeciona el cubo que se obtiene al armar la siguiente figura",
+				options: ["https://i.imgur.com/aTZlcjr.png", "https://i.imgur.com/AyzwQwd.png", "https://i.imgur.com/D2wZYkS.png", "https://i.imgur.com/hCosoVr.png"],
+				answer: "https://i.imgur.com/aTZlcjr.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/uVTj22L.png"
+			},
+			//12
+			{
+				question: "Calcula cuál es el volumen de la siguiente figura, si el ancho y la altura de cada bloque miden 1 u y el largo 2 u",
+				options: ["A) 13", "B) 17", "C) 15", "D) 14"],
+				answer: "A) 13",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/jTOQ8cO.png"
+			},
+			//13
+			{
+				question: "Una bicicleta tiene un precio de $ 4,600.00, se compra dando un enganche de $ 1,800.00 y pagando el resto en 5 abonos mensuales",
+				options: ["A) $360.00", "B) $560.00", "C) $630.00", "D) $920.00"],
+				answer: "B) $560.00",
+				subject: "Habilidad matemática",
+				sentence: "¿de cuánto deberá ser cada pago?"
+			},
+			//14
+			{
+				question: "Una empresa necesita 2,500 focos. En una tienda compran 2/5 partes y en otra 2/10 partes.",
+				options: ["A) 2,000", "B) 1,500", "C) 2,250", "D) 1,750"],
+				answer: "B) 1,500",
+				subject: "Habilidad matemática",
+				sentence: "¿Cuántos focos ha comprado la empresa?"
+			},
+			//15
+			{
+				question: "¿Qué opción balancea la última serie?",
+				options: ["https://i.imgur.com/UwE2XhZ.png", "https://i.imgur.com/1af5hVx.png", "https://i.imgur.com/31wAeZ4.png", "https://i.imgur.com/OBLZA4J.png"],
+				answer: "https://i.imgur.com/UwE2XhZ.png",
+				subject: "Habilidad matemática",
+				sentence: "https://i.imgur.com/1yl1SLN.png"
+			},
+			//16
+			{
+				question: "Se contrataron 15 albañiles para que coloquen 120m^2 de un piso en tres jornadas de trabajo",
+				options: ["A) 20", "B) 45", "C) 15", "D) 30"],
+				answer: "B) 45",
+				subject: "Habilidad matemática",
+				sentence: "¿Cuántos albañiles más deberían contratarse para que el piso se termine en una jornada?"
+			},
+			//17
+			{
+				question: "Función de todos los seres vivos que consiste en la transformación de materia y energía",
+				options: ["A) Metabolismo", "B) Reproducción", "C) Comunicación", "D) Movimiento"],
+				answer: "A) Metabolismo",
+				subject: "Biología"
+			},
+			//18
+			{
+				question: "Promueve el cambio de las especies, según la teoría de la evolución propuesta por Darwin",
+				options: ["A) Necesidad interna al cambio", "B) Ausencia de mutaciones", "C) Selección natural", "D) Herencia de caracteres adquiridos"],
+				answer: "C) Selección natural",
+				subject: "Biología"
+			},
+			//19
+			{
+				question: "La variada morfología de relieves y la humedad hacen de México un país rico en",
+				options: ["A) selvas", "B) tipos de rocas", "C) zonas montañosas", "D) biodiversidad"],
+				answer: "D) biodiversidad",
+				subject: "Biología"
+			},
+			//20
+			{
+				question: "La conservación de los ecosistemas depende en parte de las relaciones entre los organismos que los habitan a las cuales se les denomina",
+				options: ["A) evolutivas", "B) fisiológicas", "C) energéticas ", "D) ecológicas"],
+				answer: "D) ecológicas",
+				subject: "Biología"
+			},
+			//21
+			{
+				question: "Avance tecnológico promovido por un descubrimiento biológico",
+				options: ["A) Elaboración de vacunas", "B) Descubrimiento de neutrinos", "C) Desarrollo de virus informáticos", "D) desarrollo de microscopios"],
+				answer: "A) Elaboración de vacunas",
+				subject: "Biología"
+			},
+			//22
+			{
+				question: "Son las tres etapas en las que se suele dividir el proceso de respiración celular",
+				options: ["A) Ciclo de Krebs, fermentación y cadena respiratoria", "B) Glucolisis, fermentación y ciclo de Calvin", "C) Glucolisis, ciclo de Krebs y cadena respiratoria", "D) Cadena respiratoria, fermentación y ciclo de Krebs"],
+				answer: "C) Glucolisis, ciclo de Krebs y cadena respiratoria",
+				subject: "Biología"
+			},
+			//23
+			{
+				question: "Una diferencia fundamental en relación con la obtención de energía es que los organismos ________requieren oxígeno para conseguirla, mientras que los ________no lo utilizan",
+				options: ["A) aerobios – anaerobios", "B) heterótrofos – autótrofos", "C) autótrofos – heterótrofos", "D) anaerobios – aerobios"],
+				answer: "A) aerobios – anaerobios",
+				subject: "Biología"
+			},
+			//24
+			{
+				question: "Para prevenir enfermedades relacionadas con la deficiencia o exceso de nutrientes es recomendable",
+				options: ["A) consumir solo alimentos vegetales", "B) alimentarse solo de carnes blancas", "C) llevar una dieta equilibrada", "D) ingerir complementos alimenticios"],
+				answer: "C) llevar una dieta equilibrada",
+				subject: "Biología"
+			},
+			//25
+			{
+				question: "Existen enfermedades que se producen como consecuencia de la contaminación atmosférica, entre ellas destacan principalmente",
+				options: ["A) la conjuntivitis y la neumonía", "B) el cáncer de piel y la sinusitis", "C) la urticaria y la otitis", "D) el asma y la bronquitis"],
+				answer: "D) el asma y la bronquitis",
+				subject: "Biología"
+			},
+			//26
+			{
+				question: "Tipo de reproducción biológica cuyo propósito Es la producción de individuos diferentes al progenitor",
+				options: ["A) Asexual", "B) Gemación", "C) Bipartición", "D) Sexual"],
+				answer: "D) Sexual",
+				subject: "Biología"
+			},
+			//27
+			{
+				question: "Infección de transmisión sexual causada por bacterias",
+				options: ["A) Sida", "B) Sífilis", "C) Papiloma", "D) Hepatitis C"],
+				answer: "B) Sífilis",
+				subject: "Biología"
+			},
+			//28
+			{
+				question: "Resultado de la técnica en la cual se inserta un gen de una especie diferente para modificar su estructura o alguna función",
+				options: ["A) Clon", "B) Quimera", "C) Transgénico", "D) Recombinante"],
+				answer: "C) Transgénico",
+				subject: "Biologia"
+			},
+			//29
+            {
+                question: "Identifica el siguiente tipo de ficha",
+                options: ["A) Hemerográfica", "B) Bibliográfica", "C) De resumen", "D) De síntesis"],
+                answer: "B) Bibliográfica",
+                subject: "Español",
+                sentence: "https://i.imgur.com/Az8Xiu1.png",
+                imageSize: { width: 750, height: 150 }
+            },
+			//30
+            {
+                question: "Elige las oraciones que presentan secuencias temporales.",
+                options: ["A) I y IV", "B) II y V", "C) I y III", "D) II y IV"],
+                answer: "D) II y IV",
+                subject: "Español",
+                sentence: "https://i.imgur.com/WkA5p5I.png",
+                imageSize: { width: 700, height: 400 }
+            },
+			//31
+			{
+				question: "¿Mediante qué recurso se desarrollan las ideas en el siguiente párrafo?",
+				options: ["A) Repeticiones", "B) Explicaciones", "C) Paráfrasis", "D) Ejemplos"],
+				answer: "B) Explicaciones",
+				subject: "Español",
+				sentence: "https://i.imgur.com/YlYSRnz.png",
+				imageSize: { width: 750, height: 400 }
+			},
+			//32
+			{
+				question: "Elige las oraciones que usan nexos para introducir ideas",
+				options: ["A) I y IV", "B) II y III", "C) I y II", "D) II y V"],
+				answer: "C) I y II",
+				subject: "Español",
+				sentence: "https://i.imgur.com/xLtWZRz.png",
+				imageSize: { width: 800, height: 300 }
+			},
+			//33
+			{
+				question: "Lee el siguiente párrafo y contesta después a lo que se pide.",
+				options: ["A) más", "B) de", "C) sin duda", "D) después de"],
+				answer: "D) después de",
+				subject: "Español",
+				sentence: "https://i.imgur.com/cAPj30E.png",
+				imageSize: { width: 800, height: 150 }
+			},
+			//34
+			{
+				question: "Lee el párrafo y contesta después a lo que se pide",
+				options: ["A) El orden en el que se dieron las obras y autores precursores del gótico.", "B) Que el gótico requiere de una clasificación especial, con base en las características de las obras", "C) Que el romanticismo mantiene una relación de dependencia evolutiva con el gótico inglés", "D) Cada momento literario representativo del romanticismo y del gótico"],
+				answer: "A) El orden en el que se dieron las obras y autores precursores del gótico.",
+				subject: "Español",
+				sentence: "https://i.imgur.com/7x4oeqp.png",
+				imageSize: { width: 800, height: 300 }
+			},
+			//35
+			{
+				question: "Selecciona la opción con las expresiones que presentan sucesión y simultaneidad de acciones en el siguiente texto",
+				options: ["A) Una vez que – mientras que – al mismo tiempo", "B) Mientras que – al mismo tiempo – una vez que", "C) Mientras que – una vez que – al mismo tiempo", "D) Una vez que – al mismo tiempo – mientras que"],
+				answer: "A) Una vez que – mientras que – al mismo tiempo",
+				subject: "Español",
+				sentence: "https://i.imgur.com/nykoMCS.png",
+				imageSize: { width: 800, height: 300 }
+			},
+			//36
+			{
+				question: "Se utiliza para introducir una definición o concepto, antes de escribir una cita textual, después del vocativo y antes de iniciar una enumeración",
+				options: ["A) Punto y aparte", "B) Punto y coma", "C) Dos puntos", "D) Coma"],
+				answer: "C) Dos puntos",
+				subject: "Español"
+			},
+			//37
+			{
+				question: "Selecciona el tiempo verbal en el que está escrito el siguiente fragmento",
+				options: ["A) Copretérito", "B) Futuro", "C) Pretérito perfecto", "D) Pretérito"],
+				answer: "A) Copretérito",
+				subject: "Español",
+				sentence: "https://i.imgur.com/QoU6Ckg.png",
+				imageSize: { width: 800, height: 300 }
+			},
+			//38
+			{
+				question: "Lee el siguiente texto legal y responde lo que se pide",
+				options: ["A) Informar acerca de una obligación que tienen las escuelas con respecto al transporte", "B) Indicar la forma como las escuelas deben conducir a los alumnos que viajan en el transporte escolar", "C) Dar lineamientos acerca de las instalaciones que necesitan las escuelas para tener transporte para alumnos", "D) Ofrecer alternativas para las escuelas que quieren usar transporte para los alumnos menores de edad"],
+				answer:   "A) Informar acerca de una obligación que tienen las escuelas con respecto al transporte",
+				subject: "Español",
+				sentence: "https://i.imgur.com/7xLmzVP.png",
+				imageSize: { width: 800, height: 400 }
+			},
+			//39
+			{
+				question: "¿Cuál es el efecto que el siguiente slogan pretende inducir en la sociedad?",
+				options: ["A) Diferenciar marcas", "B) Comunicar ventajas", "C) Crear confianza en la marca", "D) Cambiar la actitud del consumidor"],
+				answer: "C) Crear confianza en la marca",
+				subject: "Español",
+				sentence: "Somos el número uno"
+			},
+			//40
+			{
+				question: "Observa el anuncio y completa después lo que se pide",
+				options: ["A) exponer", "B) testimoniar objetivamente", "C) presentar puntualmente", "D) exagera"],
+				answer: "D) exagera",
+				subject: "Español",
+				sentence: "https://i.imgur.com/C59Sjyj.png",
+				imageSize: { width: 600, height: 300 }
+			},
+			//41
+			{
+				question: "Propiedades físicas de los líquidos",
+				options: ["A) Volumen definido y adoptan la forma del recipiente", "B) Volumen propio y forma definida", "C) Compresibilidad y difusibilidad", "D) Difusibilidad y expansibilidad"],
+				answer:   "A) Volumen definido y adoptan la forma del recipiente",
+				subject: "Química",
+			},
+			//42
+			{
+				question: "Un ejemplo de fenómeno químico relacionado con tu vida cotidiana es",
+				options: ["A) la evaporación del agua", "B) la congelación de los alimentos", "C) la obtención de bebidas alcohólicas a partir de jugos de frutas", "D) el lanzamiento de una pelota"],
+				answer: "C) la obtención de bebidas alcohólicas a partir de jugos de frutas",
+				subject: "Química",
+			},
+			//43
+			{
+				question: "Propiedad que indica la cantidad de materia que posee un cuerpo",
+				options: ["A) Peso", "B) Masa", "C) Presión", "D) Mol"],
+				answer: "B) Masa",
+				subject: "Química",
+			},
+			//44
+			{
+				question: "Las sustancias que resultan de la unión química de dos o más átomos en proporciones definidas son",
+				options: ["A) compuestos", "B) mezclas", "C) aleaciones", "D) elementos"],
+				answer: "A) compuestos",
+				subject: "Química",
+			},
+			//45
+			{
+				question: "Los protones corresponden al número ________ mientras que la suma de protones y neutrones es igual al número ________.",
+				options: ["A) de masa – atómico", "B) cuántico – de masa", "C) de oxidación – cuántico", "D) atómico – de masa"],
+				answer: "D) atómico – de masa",
+				subject: "Química",
+			},
+			//46
+			{
+				question: "La representación 𝐻 ∙ corresponde a",
+				options: ["A) ion hidrógeno", "B) átomo de hidrógeno", "C) la molécula de hidrógeno", "D) ion hidronio"],
+				answer: "B) átomo de hidrógeno",
+				subject: "Química",
+			},
+			//47
+			{
+				question: "Los elementos en la tabla periódica se ubican en orden creciente de su número de",
+				options: ["A) protones", "B) masa", "C) neutrones", "D) electrones"],
+				answer: "A) protones",
+				subject: "Química",
+			},
+			//48
+			{
+				question: "Los elementos de los grupos ________ y ________ son metales",
+				options: ["A) IA – IIA", "B) IIIA – VIIIA", "C) VA – VIA", "D) VIIA – VIIIA"],
+				answer: "A) IA – IIA",
+				subject: "Química",
+				sentence: "https://i.imgur.com/hkPe2LX.png",
+				imageSize: { width: 600, height: 300 }
+			},
+			//49
+			{
+				question: "En el compuesto cloruro de sodio (𝑁𝑎𝐶𝑙), el átomo de sodio (𝑁𝑎) transfiere su electrón de valencia al átomo de cloro (𝐶𝑙). De esta forma, se lleva a cabo un enlace",
+				options: ["A) iónico", "B) metálico", "C) coordinado", "D) covalente"],
+				answer: "A) iónico",
+				subject: "Química",
+			},
+			//50
+			{
+				question: "En la ecuación química",
+				options: ["A) se conservan", "B) incrementan", "C) desaparecen", "D) disminuyen"],
+				answer: "A) se conservan",
+				subject: "Química",
+				sentence: "https://i.imgur.com/jKtufmu.png",
+				imageSize: { width: 400, height: 150 }
+			},
+			//51
+			{
+				question: "La ecuación que indica que el agua interviene como reactivo es",
+				options: ["https://i.imgur.com/ijiBGqX.png", "https://i.imgur.com/4BjV5It.png", "https://i.imgur.com/1YlJtgo.png", "https://i.imgur.com/qqMA8sG.png"],
+				answer: "https://i.imgur.com/qqMA8sG.png",
+				subject: "Química",
+			},
+			//52
+			{
+				question: "En la ecuación",
+				options: ["A) 3 en la molécula de oxígeno se llama coeficiente y el 2 en el 𝐾𝐶𝑙 se llama subíndice", "B) 2 del 𝐾𝐶𝑙𝑂<sub>3</sub> sólo afecta al 𝐾𝐶𝑙 y el 2 en el 𝐾𝐶𝑙 se llama subíndice", "C) 2 del 𝐾𝐶𝑙𝑂<sub>3</sub> afecta a todo el compuesto y el 3 en la molécula de oxígeno se llama coeficiente.", "D) 3 del 𝐾𝐶𝑙𝑂<sub>3</sub> afecta a todo el compuesto y el 3 en la molécula de oxígeno se llama coeficiente"],
+				answer: "C) 2 del 𝐾𝐶𝑙𝑂<sub>3</sub> afecta a todo el compuesto y el 3 en la molécula de oxígeno se llama coeficiente.",
+				subject: "Química",
+				sentence: "https://i.imgur.com/kdpqCs6.png",
+				imageSize: { width: 300, height: 100 }
+			},
+			//53
+			{
+				question: "Una de las principales islas que dominó España como consecuencia de los viajes de exploración en América fue",
+				options: ["A) Dominica", "B) Martinica", "C) Haití", "D) Cuba"],
+				answer: "D) Cuba",
+				subject: "Historia"
+			},
+			//54
+			{
+				question: "Forma de gobierno donde el poder recae sólo en un soberano",
+				options: ["A) República", "B) Aristocracia", "C) Democracia", "D) Absolutismo"],
+				answer: "D) Absolutismo",
+				subject: "Historia"
+			},
+			//55
+			{
+				question: "Según el nacionalismo del siglo XIX, ¿qué determina lo nacional en cada Estado?",
+				options: ["A) El sentimiento de colectividad derivado del idioma, costumbres e historia común", "B) La solidaridad social en relación con las diferencias culturales de su población", "C) Los intereses tradicionales de una sociedad enfocados a resolver asuntos económicos", "D) El pensamiento de una población que defiende su religión por encima de todo"],
+				answer: "A) El sentimiento de colectividad derivado del idioma, costumbres e historia común",
+				subject: "Historia"
+			},
+			//56
+			{
+				question: "Características del fascismo italiano",
+				options: ["A) I, II y III", "B) I, II y IV", "C) II, III y IV", "D) II, IV y V"],
+				answer: "C) II, III y IV",
+				subject: "Historia",
+				sentence: "https://i.imgur.com/GhxRxHn.png",
+				imageSize: { width: 300, height: 250 }
+			},
+			//57
+			{
+				question: "La ________ hace referencia a las hostilidades no frontales entre el bloque socialista encabezado por la Unión Soviética y las potencias capitalistas representadas por Estados Unidos de América después de la Segunda Guerra Mundial.",
+				options: ["A) crisis de los misiles", "B) guerra pacifica", "C) cortina de hierro", "D) guerra fría"],
+				answer: "D) guerra fría",
+				subject: "Historia"
+			},
+			//58
+			{
+				question: "Una característica económica del bloque socialista es que",
+				options: ["A) los medios de producción son propiedad privada", "B) los medios productivos son propiedad colectiva", "C) está dirigida por el Estado neoliberal", "D) está dirigida por un Estado benefactor"],
+				answer: "B) los medios productivos son propiedad colectiva",
+				subject: "Historia"
+			},
+			//59
+			{
+				question: "Ordena de mayor a menor importancia los cargos políticos que integraban la estructura del gobierno virreinal durante el siglo XVIII",
+				options: ["A) I, III, II y IV", "B) I, II, III y IV", "C) II, III, IV y I", "D) III, I, IV y II"],
+				answer: "A) I, III, II y IV",
+				subject: "Historia",
+				sentence: "https://i.imgur.com/91uAdea.png",
+				imageSize: { width: 300, height: 150 }
+			},
+			//60
+			{
+				question: "El absolutismo ilustrado de los Borbones se caracterizó por",
+				options: ["A) limitar a la Iglesia y centralizar el poder", "B) dar autonomía a la Iglesia y a los cabildos indígenas", "C) dar libertades a las colonias e impulsar el comercio", "D) incluir a los criollos en cargos públicos y promover la libertad de comercio"],
+				answer: "A) limitar a la Iglesia y centralizar el poder",
+				subject: "Historia"
+			},
+			//61
+			{
+				question: "En el siglo XIX, las reclamaciones monetarias de ciudadanos extranjeros afectados por las guerras civiles de México dieron origen a conflictos internacionales como",
+				options: ["A) la guerra con Estados Unidos de América", "B) la Primera Intervención Francesa", "C) la invasión de Isidro Barradas", "D) el conflicto de la Mesilla"],
+				answer: "B) la Primera Intervención Francesa",
+				subject: "Historia"
+			},
+			//62
+			{
+				question: "La intervención estadounidense del siglo XIX fue la que más costos le trajo a México porque",
+				options: ["A) perdió más de la mitad de su territorio (2 millones 400 mil kilómetros cuadrados) y agudizó su inestabilidad política", "B) se acabó la alianza comercial con Estados Unidos de América lo que debilitó a la economía mexicana", "C) el gobierno estadounidense esclavizó a los pobladores de Texas, Alta California y Nuevo México", "D) se incrementó la deuda con los Estados Unidos de América y se tuvieron que pagar 15 millones de pesos"],
+				answer: "A) perdió más de la mitad de su territorio (2 millones 400 mil kilómetros cuadrados) y agudizó su inestabilidad política",
+				subject: "Historia"
+			},
+			//63
+			{
+				question: "Al aplicar los artículos 3 y 130 constitucionales, que establecían el principio de laicidad en el país, Plutarco Elías Calles provocó",
+				options: ["A) la promoción de religiones diferentes al catolicismo, apoyadas por el ejército", "B) el despojo de propiedades de la Iglesia y el encarcelamiento de clérigos", "C) el establecimiento de lineamientos estatales de censura a las religiones", "D) la Guerra Cristera, conflicto armado entre católicos y el Estado mexicano"],
+				answer: "D) la Guerra Cristera, conflicto armado entre católicos y el Estado mexicano",
+				subject: "Historia"
+			},
+			//64
+			{
+				question: "Organismo para promover la participación ciudadana que surgió de los movimientos sociales en México después de la década de 1980",
+				options: ["A) El Partido Revolucionario Institucional", "B) La Confederación de Trabajadores de México", "C) El Partido Acción Nacional", "D) El Instituto Federal Electoral"],
+				answer: "D) El Instituto Federal Electoral",
+				subject: "Historia"
+			},
+			//65
+			{
+				question: "Realiza las siguientes operaciones e indica la respuesta correcta",
+				options: ["A) 7", "B) 5", "C) 9", "D) 3"],
+				answer: "B) 5",
+				subject: "Matemáticas",
+				sentence: "https://i.imgur.com/0StUN7j.png",
+				imageSize: { width: 600, height: 100 }
+			},
+			//66
+			{
+				question: "El mínimo común múltiplo de 6 y 15 es",
+				options: ["A) 18", "B) 20", "C) 30", "D) 90"],
+				answer: "C) 30",
+				subject: "Matemáticas"
+			},
+			//67
+			{
+				question: "Indica qué porcentaje de 900 es 54",
+				options: ["A) 5.4%", "B) 6.4%", "C) 4%", "D) 6%"],
+				answer: "D) 6%",
+				subject: "Matemáticas"
+			},
+			//68
+			{
+				question: " ¿Cuál de las siguientes expresiones representa el enunciado 'La semisuma de los cuadrados de a y b'?",
+				options: ["https://i.imgur.com/kI96n7O.png", "https://i.imgur.com/2IMLZUv.png", "https://i.imgur.com/qt9pD9i.png", "https://i.imgur.com/X9cfhUF.png"],
+				answer: "https://i.imgur.com/qt9pD9i.png",
+				subject: "Matemáticas"
+			},
+			//69
+			{
+				question: "María tiene cierta cantidad de dinero. Juan tiene el doble de María; y Pepe, la mitad de María. Si juntos acumulan $3,521.00, ¿cuánto dinero posee Juan?",
+				options: ["A) $2,347.33", "B) $1,173.66", "C) $2,012.00", "D) $1,006.00"],
+				answer: "C) $2,012.00",
+				subject: "Matemáticas"
+			},
+			//70
+			{
+				question: "La medida de uno de los ángulos interiores de un triángulo es, de los dos ángulos restantes se sabe que uno es el doble de x y el otro es igual a la tercera parte de x. ¿Cuál es la medida del ángulo interior mayor?",
+				options: ["A) 36°", "B) 49°", "C) 54°", "D) 108°"],
+				answer: "D) 108°",
+				subject: "Matemáticas"
+			},
+			//71
+			{
+				question: "La solución de la ecuación",
+				options: ["A) 4", "B) 8", "C) 6", "D) 2"],
+				answer: "A) 4",
+				subject: "Matemáticas",
+				sentence: "https://i.imgur.com/ye0yVC4.png",
+				imageSize: { width: 250, height: 50 }
+			},
+			//72
+			{
+				question: "La siguiente tabla contiene el promedio de las temperaturas registradas durante 2015 en la Ciudad de México. Se sabe que la temperatura ambiente es de alrededor 21 °C. De acuerdo con la información se puede afirmar que el mes más",
+				options: ["A) frío fue enero", "B) caliente fue agosto", "C) frío fue diciembre", "D) caliente fue marzo"],
+				answer: "A) frío fue enero",
+				subject: "Matemáticas",
+				sentence: "https://i.imgur.com/00dhxKf.png",
+				imageSize: { width: 500, height: 300 }
+			},
+			//73
+			{
+				question: "El porcentaje que se tiene al tirar una moneda y de que esta caiga cara es",
+				options: ["A) 100 %", "B) 25 %", "C) 50 %", "D) 10 %"],
+				answer: "C) 50 %",
+				subject: "Matemáticas"
+			},
+			//74
+			{
+				question: "Una persona ignora la altura de una casa. La persona mide 1.65 m y proyecta una sombra de 3 m; la casa, por su parte, proyecta una sombra de 8 m. La altura de la casa es",
+				options: ["A) 13.2 m", "B) 14.54 m", "C) 4.95 m", "D) 4.4 m"],
+				answer: "D) 4.4 m",
+				subject: "Matemáticas"
+			},
+			//75
+			{
+				question: "Si la base de un triángulo rectángulo mide 8 cm y su lado inclinado 10 cm, ¿cuántos centímetros tiene su altura?",
+				options: ["A) 6", "B) 18", "C) √6", "D) √18"],
+				answer: "A) 6",
+				subject: "Matemáticas"
+			},
+			//76
+			{
+				question: " El seno y el coseno del ángulo A para el triángulo rectángulo ABC son:",
+				options: ["https://i.imgur.com/uB8zURd.png", "https://i.imgur.com/xJygBQU.png", "https://i.imgur.com/xCnCOBL.png", "https://i.imgur.com/etQvZmO.png"],
+				answer: "https://i.imgur.com/uB8zURd.png",
+				subject: "Matemáticas",
+				sentence: "https://i.imgur.com/Eeaagun.png",
+				imageSize: { width: 400, height: 300 }
+			},
+			//77
+			{
+				question: "Mercurio y la Luna se parecen en que",
+				options: ["A) carecen de una atmósfera", "B) están más cerca del Sol", "C) se ubican en el espacio exterior", "D) están envueltos en una atmósfera de gases"],
+				answer: "A) carecen de una atmósfera",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/hJKtFXM.png",
+				imageSize: { width: 700, height: 800 }
+			},
+			//78
+			{
+				question: "Los colores que percibe el hombre llevan esta secuencia:",
+				options: ["A) naranja, verde, violeta, rojo, amarillo y azul", "B) rojo, naranja, amarillo, verde, azul y violeta", "C) naranja, amarillo, azul, violeta, verde y rojo", "D) amarillo, naranja, rojo, violeta, azul y verde"],
+				answer: "B) rojo, naranja, amarillo, verde, azul y violeta",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/hJKtFXM.png",
+				imageSize: { width: 700, height: 800 }
+			},
+			//79
+			{
+				question: "El agua, el aire y el vidrio son medios materiales adecuados para que la luz",
+				options: ["A) se transforme", "B) se acumule", "C) disminuya", "D) se disperse"],
+				answer: "D) se disperse",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/hJKtFXM.png",
+				imageSize: { width: 700, height: 800 }
+			},
+			//80
+			{
+				question: "El texto relata una historia en la que",
+				options: ["A) el contador de cuentos dice a los niños que saca del pozo los cuentos que cuenta y él prefiere contárselos a la preguntona", "B) un hombre que se sienta en el brocal del pozo le cuenta a una niña preguntona el secreto del pozo", "C) el contador de cuentos embelesa a los niños con sus historias, le confiesa a la preguntona que se los cuenta el pozo", "D) el cuenta cuentos le habla a una persona que está fuera de la historia y le dice que saca los cuentos del pozo"],
+				answer: "C) el contador de cuentos embelesa a los niños con sus historias, le confiesa a la preguntona que se los cuenta el pozo",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/QDdSrtv.png",
+				imageSize: { width: 900, height: 700 }
+			},
+			//81
+			{
+				question: "Selecciona el inciso que contiene el resumen correcto del texto",
+				options: ["A) Una niñita frágil es quien provoca que el contador revele su secreto, con relación al lugar de donde éste obtiene sus cuentos", "B) El contador de cuentos es un personaje que al atardecer cuenta historias fantásticas a los niños de Palo Verde, relatos que por las noches, en días de luna, le dice el pozo", "C) Los cuentos más bonitos que relata el contador los saca del pozo, los días de luna llena. Para escucharlos se sienta en el brocal", "D) Ante la pregunta de una niña, el contador reconoce que sus cuentos los obtiene del pozo, en donde están revueltos con el agua y las ranas, pero hay que saber sacarlos"],
+				answer: "B) El contador de cuentos es un personaje que al atardecer cuenta historias fantásticas a los niños de Palo Verde, relatos que por las noches, en días de luna, le dice el pozo",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/QDdSrtv.png",
+				imageSize: { width: 800, height: 700 }
+			},
+			//82
+			{
+				question: "Completa el siguiente cuadro sinóptico",
+				options: ["https://i.imgur.com/nasoGox.png", "https://i.imgur.com/kGaQkBo.png", "https://i.imgur.com/gxXUN4B.png", "https://i.imgur.com/nILG3EU.png"],
+				answer: "https://i.imgur.com/nasoGox.png",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/OK402ES.png",
+				imageSize: { width: 1000, height: 700 }
+			},
+			//83
+			{
+				question: "En la oración 'La preguntona es una niñita frágil, como de cera: blanca y crédula', encontramos una relación",
+				options: ["A) comparativa", "B) ejemplificativa", "C) analógica", "D) explicativa"],
+				answer: "A) comparativa",
+				subject: "Habilidad Verbal",
+				sentence: "https://i.imgur.com/QDdSrtv.png",
+				imageSize: { width: 800, height: 600 }
+			},
+			//84
+			{
+				question: "De la pregunta 84 a la 86, completa las siguientes ANALOGÍAS",
+				options: ["A) modales", "B) generosidad", "C) honradez", "D) efectividad"],
+				answer: "A) modales",
+				subject: "Habilidad Verbal",
+				sentence: "EDUCACIÓN es a ENSEÑANZA como cortesía es a"
+			},
+			//85
+			{
+				question: "De la pregunta 84 a la 86, completa las siguientes ANALOGÍAS",
+				options: ["A) poeta a poesía", "B) mecánico a herramienta", "C) político a ley", "D) carpintero a carpintería"],
+				answer: "B) mecánico a herramienta",
+				subject: "Habilidad Verbal",
+				sentence: "MÚSICO es a INSTRUMENTO como"
+			},
+			//86
+			{
+				question: "De la pregunta 84 a la 86, completa las siguientes ANALOGÍAS",
+				options: ["A) mujer", "B) nominal", "C) apellido", "D) hombre"],
+				answer: "B) nominal",
+				subject: "Habilidad Verbal",
+				sentence: "ESTRELLA es a SIDERAL como NOMBRE a"
+			},
+			//87
+			{
+				question: "De la pregunta 87 a la 89, selecciona la opción que sustituya con un ANTÓNIMO la palabra en mayúsculas",
+				options: ["A) Estimulante", "B) Ordinario", "C) Fascinante", "D) Casual"],
+				answer: "B) Ordinario",
+				subject: "Habilidad Verbal",
+				sentence: "SORPRENDENTE"
+			},
+			//88
+			{
+				question: "De la pregunta 87 a la 89, selecciona la opción que sustituya con un ANTÓNIMO la palabra en mayúsculas",
+				options: ["A) Surgir", "B) Desaparecer", "C) Sucumbir", "D) Brotar"],
+				answer: "B) Desaparecer",
+				subject: "Habilidad Verbal",
+				sentence: "MANAR"
+			},
+			//89
+			{
+				question: "De la pregunta 87 a la 89, selecciona la opción que sustituya con un ANTÓNIMO la palabra en mayúsculas",
+				options: ["A) Reposo", "B) Diversión", "C) Actividad", "D) Distracción"],
+				answer: "C) Actividad",
+				subject: "Habilidad Verbal",
+				sentence: "OCIO"
+			},
+			//90
+			{
+				question: "De la pregunta 90 a la 92, selecciona la opción que sustituya con un SINÓNIMO la palabra en mayúsculas",
+				options: ["A) Esencia", "B) Desenlace", "C) Estructura", "D) Introducción"],
+				answer: "C) Estructura",
+				subject: "Habilidad Verbal",
+				sentence: "...el desarrollo del CUERPO de la novela fatiga el cuerpo del escritor"
+			},
+			//91
+			{
+				question: "De la pregunta 90 a la 92, selecciona la opción que sustituya con un SINÓNIMO la palabra en mayúsculas",
+				options: ["A) adquiere – descuido", "B) desiste – descortesía", "C) observa – infelicidad", "D) acredita – deseo"],
+				answer: "C) observa – infelicidad",
+				subject: "Habilidad Verbal",
+				sentence: "El amante ADVIERTE que esa dicha será el fin de su DESDICHA"
+			},
+			//92
+			{
+				question: "De la pregunta 90 a la 92, selecciona la opción que sustituya con un SINÓNIMO la palabra en mayúsculas",
+				options: ["A) Riqueza", "B) Rectitud", "C) Astucia", "D) Belleza"],
+				answer: "B) Rectitud",
+				subject: "Habilidad Verbal",
+				sentence: "La PROBIDAD de tu madre le ha permitido ser una mujer respetada en su trabajo"
+			},
+			//93
+			{
+				question: "La zona de la ciudad e Nezahualcóyotl era hasta hace treinta años zona de cultivo",
+				options: ["A) relación", "B) localización", "C) distribución", "D) temporalidad"],
+				answer: "D) temporalidad",
+				subject: "Geografía",
+				sentence: "Este ejemplo hace referencia al principio de"
+			},
+			//94
+			{
+				question: "Es una representación gráfica de una porción de la superficie terrestre, como uno de sus elementos principales suele contener coordenadas para localizar puntos específicos",
+				options: ["A) Mapa", "B) Fotografía aérea", "C) Plano", "D) Croquis"],
+				answer: "A) Mapa",
+				subject: "Geografía"
+			},
+			//95
+			{
+				question: "Etapas del ciclo hidrológico que permiten, respectivamente, la recarga de los mantos acuíferos y las presas",
+				options: ["A) Escurrimiento y evaporación", "B) Precipitación y condensación", "C) Evaporación y condensación", "D) Filtración y escurrimiento"],
+				answer: "D) Filtración y escurrimiento",
+				subject: "Geografía"
+			},
+			//96
+			{
+				question: "El clima cálido lluvioso (Af) por latitud se distribuye en",
+				options: ["A) la zona ecuatorial", "B) el trópico de Capricornio", "C) los círculos polares", "D) las latitudes intermedias"],
+				answer: "A) la zona ecuatorial",
+				subject: "Geografía"
+			},
+			//97
+			{
+				question: "La preservación de los arrecifes de corales favorece el equilibrio del clima planetario porque",
+				options: ["A) controlan la densidad del agua oceánica", "B) reducen los residuos sólidos del mar y ríos", "C) mantienen controlado el crecimiento de plancton", "D) contribuyen en la disminución de dióxido de carbono"],
+				answer: "D) contribuyen en la disminución de dióxido de carbono",
+				subject: "Geografía"
+			},
+			//98
+			{
+				question: "Es el desplazamiento de las placas tectónicas donde una se unde bajo la otra, ocasionando actividad volcánica y tectónica",
+				options: ["A) Expansión", "B) Subducción", "C) Separación", "D) Falla"],
+				answer: "B) Subducción",
+				subject: "Geografía"
+			},
+			//99
+			{
+				question: "Principales ciudades de México que destacan por la extracción de hidrocarburos",
+				options: ["A) Coatzacoalcos y Poza Rica", "B) Salamanca y Tampico", "C) Puerto Madero y Campeche", "D) Veracruz y Tuxpan"],
+				answer: "A) Coatzacoalcos y Poza Rica",
+				subject: "Geografía"
+			},
+			//100
+			{
+				question: "Organización que contribuye a la globalización determinando las normas que regulan el comercio entre los países del mundo",
+				options: ["A) Organización Mundial del Comercio", "B) Banco Mundial", "C) Fondo Monetario Internacional", "D) Organización de Cooperación y Desarrollo Económico"],
+				answer: "A) Organización Mundial del Comercio",
+				subject: "Geografía"
+			},
+			//101
+			{
+				question: "Son características de los países centrales",
+				options: ["A) I, III y V", "B) III, IV y V", "C) II, III y IV", "D) I, IV, y V"],
+				answer: "D) I, IV, y V",
+				subject: "Geografía",
+				sentence: "https://i.imgur.com/wKCXI4K.png",
+				imageSize: { width: 300, height: 200 }
+			},
+			//102
+			{
+				question: "Elementos básicos de la diversidad cultural en el mundo",
+				options: ["A) Idiomas y religiones", "B) Gastronomía y gobiernos", "C) Etnias y territorios", "D) Gobiernos y tradiciones"],
+				answer: "A) Idiomas y religiones",
+				subject: "Geografía"
+			},
+			//103
+			{
+				question: "País que en la última década ha sufrido una severa guerra civil alentada por intervención internacional",
+				options: ["A) Irán", "B) Kuwait", "C) Israel", "D) Siria"],
+				answer: "D) Siria",
+				subject: "Geografía"
+			},
+			//104
+			{
+				question: "Los paisajes de agaves y las antiguas instalaciones industriales que producen el tequila son consideradas Patrimonio Cultural de la Humanidad, éstos se ubican en",
+				options: ["A) Chihuahua", "B) Jalisco", "C) Oaxaca", "D) Michoacán"],
+				answer: "B) Jalisco",
+				subject: "Geografía"
+			},
+			//105
+			{
+				question: "De acuerdo con la gráfica, indica en qué intervalo el móvil adquiere una velocidad constante",
+				options: ["A) t = 0 a 4 s", "B) t = 4 a 8 s", "C) t = 8 a 12 s", "D) t = 12 a 16 s"],
+				answer: "B) t = 4 a 8 s",
+				subject: "Física",
+				sentence: "https://i.imgur.com/6dmjiyQ.png",
+				imageSize: { width: 400, height: 300 }
+			},
+			//106
+			{
+				question: "Una lancha se mueve con rapidez constante y en línea recta, a las 9:00 de la mañana pasa frente a una boya marcada con el kilómetro 4 y treinta minutos después frente a la boya marcada con el kilómetro 8. ¿Cuál es su rapidez?",
+				options: ["A) 4 km/h", "B) 30 km/h", "C) 8 km/h", "D) 2 km/h"],
+				answer: "C) 8 km/h",
+				subject: "Física"
+			},
+			//107
+			{
+				question: "Si se aplica una fuerza de 10 Newtons a un balón de 1 kg de masa, originalmente en reposo, su aceleración será de",
+				options: ["A) 10𝑚/𝑠^2", "B) 0,1𝑚/𝑠^2", "C) 1𝑚/𝑠^2", "D) 10𝑠/𝑚^2"],
+				answer: "A) 10𝑚/𝑠^2",
+				subject: "Física"
+			},
+			//108
+			{
+				question: "Cuando levantamos un cuerpo de masa m hasta una altura h, ¿qué tipo de energía se va almacenando en ese cuerpo?",
+				options: ["A) Mecánica cinética", "B) Mecánica y eléctrica total", "C) Mecánica potencial", "D) Eléctrica y magnética total"],
+				answer: "C) Mecánica potencial",
+				subject: "Física"
+			},
+			//109
+			{
+				question: "Un objeto, a una altura de 30 m, tiene una energía potencial de 70 J. Si se deja caer, después de 2 segundos su energía cinética será de 25 J. ¿Cuál será el valor de su energía potencial a los 2 segundos?",
+				options: ["A) 95 J", "B) 70 J", "C) 45 J", "D) 25 J"],
+				answer: "C) 45 J",
+				subject: "Física"
+			},
+			//110
+			{
+				question: "¿Cuál es la forma de electrizar un cuerpo cuando se acaricia un gato o se arrastran los pies sobre una alfombra?",
+				options: ["A) Contacto", "B) Inducción", "C) Fricción", "D) Conducción"],
+				answer: "C) Fricción",
+				subject: "Física"
+			},
+			//111
+			{
+				question: "En un día muy caluroso, una persona deja su coche estacionado a la intemperie. Si al volver se apoya en el cofre, experimentará",
+				options: ["A) una descarga de energía estática (toques)", "B) una transferencia de energía en forma de calor", "C) una transferencia de energía en forma de temperatura", "D) un aumento de temperatura de forma gradual"],
+				answer: "B) una transferencia de energía en forma de calor",
+				subject: "Física"
+			},
+			//112
+			{
+				question: "¿Cuál de las siguientes es la ecuación que relaciona la fuerza 𝐹1 y el área 𝐴1 de un émbolo de una prensa hidráulica, con la fuerza 𝐹2 y el área 𝐴2 del otro émbolo?",
+				options: ["https://i.imgur.com/o3T5YZU.png", "https://i.imgur.com/aT5Fw64.png", "https://i.imgur.com/9ff9U2p.png", "https://i.imgur.com/l1hSb7m.png"],
+				answer: "https://i.imgur.com/l1hSb7m.png",
+				subject: "Física"
+			},
+			//113
+			{
+				question: "El agua ________ es una sustancia conductora de electricidad",
+				options: ["A) con azúcar", "B) oxigenada", "C) destilada", "D) de mar"],
+				answer: "D) de mar",
+				subject: "Física"
+			},
+			//114
+			{
+				question: "El movimiento controlado de cargas ¿eléctricas a través de un conductor genera un",
+				options: ["A) campo magnético", "B) corto circuito", "C) circuito en paralelo", "D) circuito en serie"],
+				answer: "A) campo magnético",
+				subject: "Física"
+			},
+			//115
+			{
+				question: "Un hombre sentado en un muelle observa que el número de crestas de las olas que chocan contra la base es igual mientras transcurre el tiempo y concluye que la",
+				options: ["A) longitud de onda es variable", "B) frecuencia de onda es constante", "C) velocidad de onda es variable", "D) onda no se difracta"],
+				answer: "B) frecuencia de onda es constante",
+				subject: "Física"
+			},
+			//116
+			{
+				question: "¿Qué le ocurre a la luz blanca cuando incide sobre un prisma de vidrio?",
+				options: ["A) Sin desviarse pasa el prisma sin cambios", "B) Se dispersa y aparecen los siete colores del arcoíris", "C) Se desvía y sale como luz blanca en otra dirección", "D) Se desvía y aparecen los tres colores básicos del prisma"],
+				answer: "B) Se dispersa y aparecen los siete colores del arcoíris",
+				subject: "Física"
+			},
+			//117
+			{
+				question: "De los casos que se enlistan a continuación, ¿cuál presenta una situación donde sólo al interesado le compete tomar decisiones?",
+				options: ["A) Emilio se encuentra con un grupo de personas de una asociación a favor de la donación de órganos y le preguntan si quiere firmar como donador", "B) Ernesto, habitante de un condominio, está inconforme con los servicios de administración y vigilancia por lo tanto quiere cambiar la compañía actualmente contratada", "C) Edgardo ha encontrado anunciado un curso que puede ayudarlo a desempañarse mejor, pero tomarlo le exige salir una hora antes de su horario laboral", "D) Vinicio, un estudiante de preparatoria, ha sido invitado a una fiesta en Cuernavaca; él está muy interesado en ir pues asistirán todos sus amigos"],
+				answer:   "A) Emilio se encuentra con un grupo de personas de una asociación a favor de la donación de órganos y le preguntan si quiere firmar como donador",
+				subject: "Formación Cívica y Ética"
+			},
+			//118
+			{
+				question: "¿Cuáles de las siguientes acciones son obligaciones jurídicas?",
+				options: ["A) I y II", "B) II y IV", "C) III y IV", "D) III y V"],
+				answer: "C) III y IV",
+				subject: "Formación Cívica y Ética",
+				sentence: "https://i.imgur.com/wco1qx9.png",
+				imageSize: { width: 300, height: 200 }
+			},
+			//119
+			{
+				question: "Relaciona los valores con las respectivas acciones que los ejemplifican",
+				options: ["A) I: b – II: a, e – III: d, c", "B) I: b, d – II: a – III: e, c", "C) I: b, e – II: a, c – III: d", "D) I: d – II: b, e – III: a, c"],
+				answer: "C) I: b, e – II: a, c – III: d",
+				subject: "Formación Cívica y Ética",
+				sentence: "https://i.imgur.com/NdG0xSf.png",
+				imageSize: { width: 400, height: 500 }
+			},
+			//120
+			{
+				question: "¿En qué caso se ejemplifica la importancia de la relación del ser humano con su entorno para la conformación de su identidad?",
+				options: ["A) Balbina está callada y distante, pues recientemente ha sentido que nadie la comprende", "B) Eloy prefiere cenar tacos en la calle, pues el trabajo en la oficina no le deja tiempo para nada en el día", "C) Yolanda es una persona tolerante y reflexiva, pues en su familia siempre ha prevalecido el diálogo y la empatía", "D) José se reúne a jugar dominó con sus amigos, pues quiere fomentar su agilidad mental"],
+				answer: "C) Yolanda es una persona tolerante y reflexiva, pues en su familia siempre ha prevalecido el diálogo y la empatía",
+				subject: "Formación Cívica y Ética"
+			},
+			//121
+			{
+				question: "Identifica un cambio afectivo que se sufre en la etapa de la adolescencia",
+				options: ["A) Aparición del deseo sexual", "B) Engrosamiento del tono de voz", "C) Adaptarse a un nuevo nivel escolar", "D) Buscar la aceptación de los amigos"],
+				answer: "D) Buscar la aceptación de los amigos",
+				subject: "Formación Cívica y Ética"
+			},
+			//122
+			{
+				question: "Formas de contagio del VIH",
+				options: ["A) I, II y III", "B) I, II y IV", "C) I, II y V", "D) II, IV y V"],
+				answer: "B) I, II y IV",
+				subject: "Formación Cívica y Ética",
+				sentence: "https://i.imgur.com/sCb8PER.png",
+				imageSize: { width: 300, height: 200 }
+			},
+			//123
+			{
+				question: "De acuerdo con los principios democráticos, ¿quiénes deben gobernar?",
+				options: ["A) Las mayorías", "B) Los cultos", "C) Los eficaces", "D) Los expertos"],
+				answer: "A) Las mayorías",
+				subject: "Formación Cívica y Ética"
+			},
+			//124
+			{
+				question: "Al grupo de personas que viven en un lugar delimitado geográficamente y actúan de acuerdo con los preceptos de las líneas de conducta que define la autoridad se le llama",
+				options: ["A) ciudadanía", "B) estado", "C) connacionales", "D) población"],
+				answer: "D) población",
+				subject: "Formación Cívica y Ética"
+			},
+			//125
+			{
+				question: "Una facultad del gobierno municipal es",
+				options: ["A) crear leyes sobre educación", "B) administrar colectas para la Cruz Roja", "C) nombrar a los secretarios de Estado", "D) otorgar licencias y permisos para construir"],
+				answer: "D) otorgar licencias y permisos para construir",
+				subject: "Formación Cívica y Ética"
+			},
+			//126
+			{
+				question: "La información preventiva de no violencia y discriminación hacia las mujeres en los medios de comunicación cumple con una función",
+				options: ["A) social", "B) de género", "C) moral", "D) legal"],
+				answer: "A) social",
+				subject: "Formación Cívica y Ética"
+			},
+			//127
+			{
+				question: "En su artículo 3, la Declaración de Derechos Humanos Emergentes reconoce que",
+				options: ["A) de vivir en un medio ambiente sano y equilibrado", "B) a la vida de las generaciones futuras", "C) de vivir en un pueblo lleno de biodiversidad", "D) de vivir la biodiversidad de manera sustentable"],
+				answer: "A) de vivir en un medio ambiente sano y equilibrado",
+				subject: "Formación Cívica y Ética",
+				sentence: "https://i.imgur.com/KAnhhPB.png",
+				imageSize: { width: 700, height: 200 }
+			},
+			//128
+			{
+				question: "¿Cuáles son las características de la negociación en la resolución y manejo de conflictos?",
+				options: ["A) I, IV y V", "B) I, III y IV", "C) I, II y V", "D) II, III y IV"],
+				answer: "B) I, III y IV",
+				subject: "Formación Cívica y Ética",
+				sentence: "https://i.imgur.com/px0S1IM.png",
+				imageSize: { width: 300, height: 200 }
+			}
+        ];
+		
+        let currentQuestion = 0, correctAnswers = 0, responses = [], startTime, endTime, timerInterval;
+        let studentName = "";
+        const examDuration = 150 * 60;
+
+        const startBtn = document.getElementById("startBtn");
+        const startContainer = document.getElementById("start-container");
+        const quizContainer = document.getElementById("quiz-container");
+        const resultContainer = document.getElementById("result-container");
+        const timerDisplay = document.getElementById("timer");
+        const questionNumber = document.getElementById("question-number");
+        const questionSubject = document.getElementById("question-subject");
+        const questionText = document.getElementById("question-text");
+        const questionSentence = document.getElementById("question-sentence");
+        const optionsContainer = document.getElementById("options");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreDisplay = document.getElementById("score");
+        const totalTimeDisplay = document.getElementById("total-time");
+        const downloadBtn = document.getElementById("downloadBtn");
+
+        startBtn.addEventListener("click", () => {
+            studentName = document.getElementById("studentName").value.trim();
+            if (studentName === "") {
+                alert("Por favor ingresa tu nombre completo.");
+                return;
+            }
+            startContainer.style.display = "none";
+            quizContainer.style.display = "block";
+            startTime = new Date();
+            startTimer();
+            showQuestion();
+        });
+
+        function startTimer() {
+            let remainingTime = examDuration;
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                timerDisplay.textContent = `Tiempo restante: ${minutes}m ${seconds}s`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    endExam();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) return endExam();
+            const question = questions[currentQuestion];
+            document.getElementById("question-number").textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById("question-subject").textContent = `Asignatura: ${question.subject}`;
+            document.getElementById("question-text").textContent = question.question;
+            document.getElementById("question-sentence").innerHTML = "";
+
+            if (question.sentence && question.sentence.includes("http")) {
+                const img = document.createElement("img");
+                img.src = question.sentence;
+                img.alt = "Imagen de la oración";
+				img.width = question.imageSize?.width || 350;
+				img.height = question.imageSize?.height || 200;
+				questionSentence.appendChild(img);
+			} else if (question.sentence) {
+				questionSentence.textContent = question.sentence;
+            }
+
+        optionsContainer.innerHTML = "";
+			question.options.forEach(option => {
+			const label = document.createElement("label");
+			const input = document.createElement("input");
+				input.type = "radio";
+				input.name = "answer";
+				input.value = option;
+				label.appendChild(input);
+
+        if (option.includes("http")) {
+            const img = document.createElement("img");
+            img.src = option;
+            img.alt = "Imagen opción";
+            img.width = 200;
+            label.appendChild(img);
+        } else {
+            const span = document.createElement("span");
+			span.innerHTML = option; // Renderiza HTML para subíndices
+			label.appendChild(span);
+        }
+
+        optionsContainer.appendChild(label);
+        optionsContainer.appendChild(document.createElement("br"));
+    });
+        }
+
+        nextBtn.addEventListener("click", () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (!selectedOption) return alert("Por favor selecciona una respuesta.");
+            
+            const question = questions[currentQuestion];
+            responses.push({ 
+                question: question.question, 
+                selected: selectedOption.value, 
+                correct: selectedOption.value === question.answer, 
+                subject: question.subject 
+            });
+
+            if (selectedOption.value === question.answer) correctAnswers++;
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endExam();
+            }
+        });
+
+        function endExam() {
+			endTime = new Date(); // Captura la hora de finalización del examen
+			clearInterval(timerInterval);
+			quizContainer.style.display = "none";
+			resultContainer.style.display = "block";
+			scoreDisplay.textContent = `Aciertos: ${correctAnswers} de ${questions.length}`;
+		}
+
+		
+		downloadBtn.addEventListener("click", () => {
+			const elapsedTime = Math.floor((endTime - startTime) / 1000); // Calcula el tiempo transcurrido en segundos
+			const minutes = Math.floor(elapsedTime / 60); // Convierte los segundos a minutos
+			const seconds = elapsedTime % 60; // Obtiene los segundos restantes
+
+			// Prepara el texto para el archivo CSV, incluyendo el nombre y el tiempo total
+			let text = `Nombre: ${studentName}\nTiempo total: ${minutes}m ${seconds}s\n\nPregunta,Respuesta Seleccionada,Correcta,Asignatura\n`;
+
+			// Añade las respuestas y si son correctas o no
+			responses.forEach(response => text += `"${response.question}","${response.selected}","${response.correct ? 'Sí' : 'No'}","${response.subject}"\n`);
+
+			// Crea el archivo CSV con el contenido
+			const blob = new Blob([text], { type: "text/csv" });
+			const a = document.createElement("a");
+			a.href = URL.createObjectURL(blob);
+			a.download = "resultados_examen.csv"; // Nombre del archivo a descargar
+			a.click();
+		});
+
+    </script>
+</body>
+</html>
